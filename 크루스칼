@@ -1,0 +1,83 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+
+long long parent[100001];
+typedef struct graph {
+	int to;
+	int from;
+	int val;
+}GRAPH;
+
+
+vector<GRAPH> v;
+
+
+int getParent(int x) {
+	if (parent[x] == x) {
+		return x;
+	}
+	return parent[x] = getParent(parent[x]);
+}
+
+void unionParent(int a, int b) {
+	a = getParent(a);
+	b = getParent(b);
+
+	if (a < b) {
+		parent[b] = a;
+	}
+	else {
+		parent[a] = b;
+	}
+}
+
+bool cmp(GRAPH a, GRAPH b) {
+	return a.val < b.val;
+}
+
+int main(void) {
+
+	ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+
+	int t;
+	cin >> t;
+	for (int tc = 1; tc <= t; tc++) {
+		int V, E;
+
+		cin >> V >> E;
+		for (int i = 1; i <= V; i++) {
+			parent[i] = i;
+		}
+		for (int i = 0; i < E; i++) {
+			GRAPH graph;
+			cin >> graph.from >> graph.to >> graph.val;
+			v.push_back(graph);
+		}
+
+		sort(v.begin(), v.end(),cmp);
+
+		int sum = 0;
+
+		for (int i = 0; i < v.size(); i++) {
+			if (getParent(v[i].from) != getParent(v[i].to)) {
+				sum = sum + v[i].val;
+				unionParent(v[i].from, v[i].to);
+			}
+		}
+
+		cout << "#" << tc << " " << sum << endl;
+		v.clear();
+		memset(parent, 0, sizeof(parent));
+
+	}
+	
+	return 0;
+}
+
+
+//크루스칼 알고리즘은 모든 노드를 방문하는 최단경로를 구하는 알고리즘이다. 유니온파인드를 사용하여 두 노드의 사이클 여부를 확인해가며 최단거리를 구한다.
